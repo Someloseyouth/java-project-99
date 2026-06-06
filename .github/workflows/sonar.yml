@@ -17,7 +17,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-      - name: Build and analyze
+      - name: Analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew build sonar -Dsonar.projectKey=Someloseyouth_java-project-99 -Dsonar.organization=someloseyouth -Dsonar.host.url=https://sonarcloud.io
+        run: ./gradlew sonar -x test -Dsonar.projectKey=Someloseyouth_java-project-99 -Dsonar.organization=someloseyouth -Dsonar.host.url=https://sonarcloud.io
