@@ -1,10 +1,7 @@
-name: SonarCloud Analysis
+name: SonarCloud
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
@@ -15,17 +12,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
-
-      - name: Build and analyze
+      - name: SonarCloud Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew build sonar --info -x test
-          -Dsonar.projectKey=Someloseyouth_java-project-99
-          -Dsonar.organization=someloseyouth
-          -Dsonar.host.url=https://sonarcloud.io
+        run: ./gradlew sonar -Dsonar.projectKey=Someloseyouth_java-project-99 -Dsonar.organization=someloseyouth -Dsonar.host.url=https://sonarcloud.io
