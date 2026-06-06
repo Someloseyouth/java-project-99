@@ -1,2 +1,8 @@
-### Hexlet tests and linter status:
-[![Actions Status](https://github.com/Someloseyouth/java-project-99/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Someloseyouth/java-project-99/actions)
+---
+title: java-project-99
+emoji: 🚀
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+---
