@@ -46,3 +46,6 @@ node_modules
 src/main/resources/static
 !src/main/resources/static/.gitkeep
 npm-cache
+
+### Private key ###
+src/main/resources/certs/private.pem
