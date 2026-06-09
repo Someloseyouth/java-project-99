@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Import;
 @Import(TestConfig.class)
 class AppApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }
