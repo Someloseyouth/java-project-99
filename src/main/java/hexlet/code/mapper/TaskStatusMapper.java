@@ -21,8 +21,8 @@ import org.mapstruct.ReportingPolicy;
 public abstract class TaskStatusMapper {
     public abstract TaskStatus map(TaskStatusCreateDTO dto);
 
-    @Mapping(target = "createdAt", expression = "java(model.getCreatedAt() != null ?"
-            + "model.getCreatedAt().toLocalDate() : null)")
+    @Mapping(target = "createdAt",
+            expression = "java(model.getCreatedAt() != null ? model.getCreatedAt().toLocalDate() : null)")
     public abstract TaskStatusDTO map(TaskStatus model);
 
     public abstract void update(TaskStatusUpdateDTO dto, @MappingTarget TaskStatus model);

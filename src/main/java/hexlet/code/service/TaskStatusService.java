@@ -14,7 +14,7 @@ import java.util.List;
 @Service
 public class TaskStatusService {
     @Autowired
-    TaskStatusRepository taskStatusRepository;
+    private TaskStatusRepository taskStatusRepository;
 
     @Autowired
     private TaskStatusMapper taskStatusMapper;
