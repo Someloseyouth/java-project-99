@@ -21,8 +21,8 @@ import org.mapstruct.ReportingPolicy;
 public abstract class UserMapper {
     public abstract User map(UserCreateDTO dto);
 
-    @Mapping(target = "createdAt", expression = "java(model.getCreatedAt() != null ?"
-            + "model.getCreatedAt().toLocalDate() : null)")
+    @Mapping(target = "createdAt",
+            expression = "java(model.getCreatedAt() != null ? model.getCreatedAt().toLocalDate() : null)")
     public abstract UserDTO map(User model);
 
     public abstract void update(UserUpdateDTO dto, @MappingTarget User model);

@@ -3,6 +3,7 @@ package hexlet.code.controller.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.config.TestConfig;
 import hexlet.code.model.User;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
 
@@ -46,6 +47,9 @@ public class UsersControllerTest {
     private UserRepository userRepository;
 
     @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
     private ModelGenerator modelGenerator;
 
     @Autowired
@@ -55,6 +59,7 @@ public class UsersControllerTest {
 
     @BeforeEach
     public void setUp() {
+        taskRepository.deleteAll();
         userRepository.deleteAll();
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
@@ -148,5 +153,4 @@ public class UsersControllerTest {
 
         mockMvc.perform(request).andExpect(status().isForbidden()); // Ожидаем 403
     }
-
 }

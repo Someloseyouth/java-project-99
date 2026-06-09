@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -21,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -53,6 +55,11 @@ public class User implements UserDetails, BaseEntity {
 
     @CreatedDate
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "assignee")
+    // По умолчанию пустой список помогает не проверять на null
+    // Выборка данных выполнится при обращении к getPosts()
+    private List<Task> tasks = new ArrayList<>();
 
     @Override
     public String getPassword() {

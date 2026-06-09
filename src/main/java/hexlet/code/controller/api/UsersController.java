@@ -33,7 +33,6 @@ public class UsersController {
     private UserUtils userUtils;
 
     @GetMapping("")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<UserDTO>> index() {
         List<UserDTO> users = userService.getAll();
 
