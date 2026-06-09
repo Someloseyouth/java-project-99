@@ -2,6 +2,7 @@ package hexlet.code.config;
 
 import hexlet.code.service.CustomUserDetailsService;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
     @Autowired
     private JwtDecoder jwtDecoder;
@@ -30,13 +31,13 @@ public class SecurityConfig {
     private CustomUserDetailsService userService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
-        return http
-                .csrf(csrf -> csrf.disable())
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/").permitAll()
                         .requestMatchers("/api/login").permitAll()
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/index.html").permitAll()
+                        .requestMatchers("/assets/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer((rs) -> rs.jwt((jwt) -> jwt.decoder(jwtDecoder)))

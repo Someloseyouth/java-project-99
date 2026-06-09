@@ -4,10 +4,15 @@ import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.dto.UserUpdateDTO;
 import hexlet.code.model.User;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.ReportingPolicy;
 
 @Mapper(
-        uses = { JsonNullableMapper.class, ReferenceMapper.class },
+        uses = {JsonNullableMapper.class, ReferenceMapper.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE
@@ -15,6 +20,10 @@ import org.mapstruct.*;
 
 public abstract class UserMapper {
     public abstract User map(UserCreateDTO dto);
+
+    @Mapping(target = "createdAt", expression = "java(model.getCreatedAt() != null ?"
+            + "model.getCreatedAt().toLocalDate() : null)")
     public abstract UserDTO map(User model);
+
     public abstract void update(UserUpdateDTO dto, @MappingTarget User model);
 }
