@@ -2,6 +2,7 @@ package hexlet.code.service;
 
 import hexlet.code.dto.TaskCreateDTO;
 import hexlet.code.dto.TaskUpdateDTO;
+import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
@@ -137,5 +138,38 @@ public class TaskServiceTest {
 
         var task = taskRepository.findById(updatedDto.getId()).orElseThrow();
         assertThat(task.getAssignee()).isNull();
+    }
+
+    @Test
+    public void testFindByIdNotFound() {
+        var nonexistentId = 999999L;
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> taskService.findById(nonexistentId));
+    }
+
+    @Test
+    public void testUpdateNotFound() {
+        var updateDto = new TaskUpdateDTO();
+        updateDto.setTitle(JsonNullable.of("Does not matter"));
+
+        var nonexistentId = 999999L;
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> taskService.update(updateDto, nonexistentId));
+    }
+
+    @Test
+    public void testGetAllByStatus() {
+        var result = taskService.getAll(
+                null,         // titleCont
+                null,                 // assigneeId
+                testStatus.getSlug(), // status
+                null                  // labelId
+        );
+
+        assertThat(result)
+                .extracting("id")
+                .contains(testTask.getId());
     }
 }
