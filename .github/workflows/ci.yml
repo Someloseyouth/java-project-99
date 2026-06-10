@@ -22,7 +22,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           RSA_PRIVATE_KEY: ${{ secrets.RSA_PRIVATE_KEY }}
-        run: bash gradlew test jacocoTestReport sonar
+        run: ./gradlew test jacocoTestReport sonarqube
           -Dsonar.projectKey=Someloseyouth_java-project-99
           -Dsonar.organization=someloseyouth
           -Dsonar.host.url=https://sonarcloud.io
