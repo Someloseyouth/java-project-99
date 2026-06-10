@@ -9,8 +9,12 @@ import java.time.LocalDate;
 @Getter
 public class UserDTO {
     private long id;
+
     private String firstName;
+
     private String lastName;
+
     private String email;
+
     private LocalDate createdAt;
 }
