@@ -34,7 +34,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-crypto:6.4.5")
     implementation("net.datafaker:datafaker:2.0.1")
     implementation("org.instancio:instancio-junit:3.3.0")
-    implementation("io.sentry:sentry-spring-boot-starter-jakarta:7.14.0")
+    implementation("io.sentry:sentry-spring-boot-4:8.33.0")
 
 
     compileOnly("org.projectlombok:lombok:1.18.42")
