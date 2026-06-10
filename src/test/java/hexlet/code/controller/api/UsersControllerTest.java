@@ -148,4 +148,20 @@ public class UsersControllerTest {
 
         mockMvc.perform(request).andExpect(status().isForbidden()); // Ожидаем 403
     }
+
+    @Test
+    public void testDeleteAnotherUser() throws Exception {
+        var anotherUser = Instancio.of(modelGenerator.getUserModel()).create();
+        userRepository.save(anotherUser);
+
+        var token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+
+        var request = delete("/api/users/" + anotherUser.getId())
+                .with(token);
+
+        mockMvc.perform(request).andExpect(status().isForbidden());
+
+        // Проверяем, что второй пользователь не удалился
+        assertThat(userRepository.findById(anotherUser.getId())).isPresent();
+    }
 }
