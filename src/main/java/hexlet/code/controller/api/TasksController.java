@@ -3,8 +3,10 @@ package hexlet.code.controller.api;
 import hexlet.code.dto.TaskCreateDTO;
 import hexlet.code.dto.TaskDTO;
 import hexlet.code.dto.TaskUpdateDTO;
+import hexlet.code.service.LabelService;
 import hexlet.code.service.TaskService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +26,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/tasks")
 public class TasksController {
-    private final TaskService taskService;
-
-    public TasksController(TaskService taskService) {
-        this.taskService = taskService;
-    }
+    @Autowired
+    private TaskService taskService;
 
     @GetMapping("")
     public ResponseEntity<List<TaskDTO>> index(

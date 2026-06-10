@@ -11,11 +11,18 @@ import java.util.List;
 @Getter
 public class TaskDTO {
     private Long id;
+
     private List<Long> labelIds = new ArrayList<>();
+
     private Integer index;
+
     private LocalDate createdAt;
+
     private Long assigneeId;
+
     private String title;
+
     private String content;
+
     private String status;
 }

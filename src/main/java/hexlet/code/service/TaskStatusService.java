@@ -5,9 +5,12 @@ import hexlet.code.dto.TaskStatusDTO;
 import hexlet.code.dto.TaskStatusUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskStatusMapper;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -15,6 +18,9 @@ import java.util.List;
 public class TaskStatusService {
     @Autowired
     private TaskStatusRepository taskStatusRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Autowired
     private TaskStatusMapper taskStatusMapper;
@@ -47,6 +53,10 @@ public class TaskStatusService {
     }
 
     public void delete(Long id) {
+        if (taskRepository.existsByTaskStatusId(id)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Status is used by a task");
+        }
         taskStatusRepository.deleteById(id);
     }
 }
