@@ -18,3 +18,7 @@ springdoc:
 rsa:
   private-key: ${RSA_PRIVATE_KEY}
   public-key: classpath:certs/public.pem
+
+sentry:
+  dsn: ${SENTRY_DSN}
+  traces-sample-rate: 1.0

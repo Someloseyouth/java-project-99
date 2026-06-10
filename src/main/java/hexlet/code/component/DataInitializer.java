@@ -72,4 +72,4 @@ public class DataInitializer implements ApplicationRunner {
             labelService.create(dto);
         }
     }
- }
+}
