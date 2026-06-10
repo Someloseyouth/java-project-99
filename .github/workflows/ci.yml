@@ -18,11 +18,13 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           RSA_PRIVATE_KEY: ${{ secrets.RSA_PRIVATE_KEY }}
-        run: ./gradlew test jacocoTestReport sonarqube
+        run: ./gradlew test jacocoTestReport sonar
           -Dsonar.projectKey=Someloseyouth_java-project-99
           -Dsonar.organization=someloseyouth
           -Dsonar.host.url=https://sonarcloud.io
