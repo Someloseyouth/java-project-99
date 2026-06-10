@@ -1,7 +1,6 @@
 package hexlet.code.controller.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.config.TestConfig;
 import hexlet.code.model.User;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
@@ -11,7 +10,6 @@ import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(TestConfig.class)
 public class UsersControllerTest {
     @Autowired
     private WebApplicationContext wac;
@@ -102,7 +99,6 @@ public class UsersControllerTest {
         assertNotNull(user);
         assertThat(user.getFirstName()).isEqualTo(data.getFirstName());
         assertThat(user.getLastName()).isEqualTo(data.getLastName());
-
     }
 
     @Test
@@ -126,8 +122,7 @@ public class UsersControllerTest {
     @Test
     public void testDelete() throws Exception {
         var token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
-        var request = delete("/api/users/" + testUser.getId())
-                .with(token);
+        var request = delete("/api/users/" + testUser.getId()).with(token);
 
         mockMvc.perform(request).andExpect(status().isNoContent());
         assertThat(userRepository.findById(testUser.getId())).isEmpty();
