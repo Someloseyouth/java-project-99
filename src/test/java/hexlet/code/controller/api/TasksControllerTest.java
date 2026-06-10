@@ -24,7 +24,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -166,5 +165,26 @@ public class TasksControllerTest {
                 .content(om.writeValueAsString(dto));
 
         mockMvc.perform(request).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testFilterByStatus() throws Exception {
+        var result = mockMvc.perform(get("/api/tasks").with(jwt())
+                .param("status", testStatus.getSlug()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        assertThat(body).contains(testTask.getName());
+    }
+
+    @Test void testFilterByAssigneeId() throws Exception {
+        var result = mockMvc.perform(get("/api/tasks").with(jwt())
+                .param("assigneeId", String.valueOf(testAssignee.getId())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        assertThat(body).contains(testTask.getName());
     }
 }
