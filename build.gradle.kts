@@ -1,6 +1,7 @@
 plugins {
     java
     checkstyle
+    jacoco
     id("org.springframework.boot") version "4.0.6"
     id("io.spring.dependency-management") version "1.1.7"
 }
@@ -52,6 +53,17 @@ dependencies {
 
 checkstyle {
     configDirectory.set(layout.projectDirectory.dir("config/checkstyle"))
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+    }
 }
 
 tasks.withType<Test> {
