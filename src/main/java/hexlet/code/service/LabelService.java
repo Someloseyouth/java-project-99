@@ -55,7 +55,7 @@ public class LabelService {
 
     public void delete(Long id) {
         if (taskRepository.existsByLabelsId(id)) {
-           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Label is associated with a task");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Label is associated with a task");
         }
         labelRepository.deleteById(id);
     }

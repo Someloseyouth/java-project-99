@@ -29,11 +29,17 @@ public class TaskService {
     @Autowired
     private TaskMapper taskMapper;
 
-    public List<TaskDTO> getAll() {
-        var tasks = taskRepository.findAll();
-        return tasks.stream()
-                .map(taskMapper::map)
-                .toList();
+    public List<TaskDTO> getAll(String titleCont, Long assigneeId, String status, Long labelId) {
+        return taskRepository.findAll().stream()
+                .filter(task -> titleCont == null
+                        || task.getName().toLowerCase().contains(titleCont.toLowerCase()))
+                .filter(task -> assigneeId == null
+                        || (task.getAssignee() != null && task.getAssignee().getId().equals(assigneeId)))
+                .filter(task -> status == null
+                        || (task.getTaskStatus() != null && status.equals(task.getTaskStatus().getSlug())))
+                .filter(task -> labelId == null
+                        || task.getLabels().stream().anyMatch(label -> label.getId().equals(labelId)))
+                .map(taskMapper::map).toList();
     }
 
     public TaskDTO create(TaskCreateDTO taskData) {

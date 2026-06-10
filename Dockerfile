@@ -1,7 +1,17 @@
 # Build stage
 FROM gradle:8.14-jdk21 AS build
 WORKDIR /app
+
+# Устанавливаем Node.js
+RUN apt-get update && apt-get install -y nodejs npm
+
 COPY . .
+
+# Устанавливаем и собираем фронтенд
+RUN npm i @hexlet/java-task-manager-frontend
+RUN npx build-frontend
+
+# Собираем Java приложение
 RUN gradle build -x test
 
 # Run stage
