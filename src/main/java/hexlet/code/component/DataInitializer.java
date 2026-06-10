@@ -1,16 +1,20 @@
 package hexlet.code.component;
 
+import hexlet.code.dto.LabelCreateDTO;
 import hexlet.code.dto.TaskStatusCreateDTO;
 import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.service.LabelService;
 import hexlet.code.service.TaskStatusService;
 import hexlet.code.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("!test")
 public class DataInitializer implements ApplicationRunner {
 
     @Autowired
@@ -21,6 +25,8 @@ public class DataInitializer implements ApplicationRunner {
 
     @Autowired
     private TaskStatusService taskStatusService;
+    @Autowired
+    private LabelService labelService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -36,6 +42,9 @@ public class DataInitializer implements ApplicationRunner {
         initTaskStatus("To be fixed", "to_be_fixed");
         initTaskStatus("To publish", "to_publish");
         initTaskStatus("Published", "published");
+
+        initTaskLabel("feature");
+        initTaskLabel("bug");
     }
 
 
@@ -51,4 +60,16 @@ public class DataInitializer implements ApplicationRunner {
             taskStatusService.create(dto);
         }
     }
-}
+
+    private void initTaskLabel(String name) {
+        var existing = labelService.getAll().stream()
+                .filter(s -> s.getName().equals(name))
+                .findFirst();
+
+        if (existing.isEmpty()) {
+            var dto = new LabelCreateDTO();
+            dto.setName(name);
+            labelService.create(dto);
+        }
+    }
+ }

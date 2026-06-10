@@ -4,11 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
 public class TaskDTO {
     private Long id;
+    private List<Long> labelIds = new ArrayList<>();
     private Integer index;
     private LocalDate createdAt;
     private Long assigneeId;

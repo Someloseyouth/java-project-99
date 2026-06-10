@@ -4,8 +4,12 @@ import hexlet.code.model.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
     boolean existsByAssigneeId(Long assigneeId);
     boolean existsByTaskStatusId(Long taskStatusId);
+    boolean existsByLabelsId(Long labelsId);
+    Optional<Task> findByName(String name);
 }

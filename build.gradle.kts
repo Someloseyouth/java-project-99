@@ -26,6 +26,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-devtools")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
     implementation("jakarta.validation:jakarta.validation-api:3.0.0")
     implementation("org.openapitools:jackson-databind-nullable:0.2.10")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")

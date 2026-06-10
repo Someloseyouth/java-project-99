@@ -1,6 +1,5 @@
 package hexlet.code.service;
 
-import hexlet.code.component.DataInitializer;
 import hexlet.code.dto.TaskCreateDTO;
 import hexlet.code.dto.TaskDTO;
 import hexlet.code.dto.TaskUpdateDTO;

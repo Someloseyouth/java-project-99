@@ -11,6 +11,10 @@ spring:
   profiles:
     active: development
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
 rsa:
   private-key: ${RSA_PRIVATE_KEY}
   public-key: classpath:certs/public.pem

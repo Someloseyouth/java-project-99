@@ -57,8 +57,6 @@ public class User implements UserDetails, BaseEntity {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "assignee")
-    // По умолчанию пустой список помогает не проверять на null
-    // Выборка данных выполнится при обращении к getPosts()
     private List<Task> tasks = new ArrayList<>();
 
     @Override
