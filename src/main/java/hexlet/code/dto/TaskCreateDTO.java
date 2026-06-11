@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @Getter
 public class TaskCreateDTO {
-    private List<Long> labelIds = new ArrayList<>();
+    private List<Long> taskLabelIds = new ArrayList<>();
 
     private Integer index;
 

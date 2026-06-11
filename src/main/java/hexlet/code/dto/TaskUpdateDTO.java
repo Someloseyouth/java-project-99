@@ -9,7 +9,7 @@ import java.util.List;
 @Setter
 @Getter
 public class TaskUpdateDTO {
-    private JsonNullable<List<Long>> labelIds;
+    private JsonNullable<List<Long>> taskLabelIds;
 
     private JsonNullable<Integer> index;
 

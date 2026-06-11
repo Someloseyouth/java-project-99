@@ -77,7 +77,7 @@ public class TaskServiceTest {
         dto.setContent("Some description");
         dto.setStatus(testStatus.getSlug());
         dto.setAssigneeId(testAssignee.getId());
-        dto.setLabelIds(List.of());
+        dto.setTaskLabelIds(List.of());
 
         var createdDto = taskService.create(dto);
 
@@ -95,7 +95,7 @@ public class TaskServiceTest {
         dto.setContent("Broken");
         dto.setStatus("unknown_status");
         dto.setAssigneeId(testAssignee.getId());
-        dto.setLabelIds(List.of());
+        dto.setTaskLabelIds(List.of());
 
         assertThrows(RuntimeException.class, () -> taskService.create(dto));
         assertThat(taskRepository.findByName("Broken")).isEmpty();

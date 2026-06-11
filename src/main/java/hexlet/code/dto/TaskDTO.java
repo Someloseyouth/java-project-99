@@ -12,7 +12,7 @@ import java.util.List;
 public class TaskDTO {
     private Long id;
 
-    private List<Long> labelIds = new ArrayList<>();
+    private List<Long> taskLabelIds = new ArrayList<>();
 
     private Integer index;
 

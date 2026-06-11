@@ -29,7 +29,7 @@ public abstract class TaskMapper {
     @Autowired
     private LabelRepository labelRepository;
 
-    @Mapping(target = "labels", source = "labelIds")
+    @Mapping(target = "labels", source = "taskLabelIds")
     @Mapping(target = "name", source = "title")
     @Mapping(target = "description", source = "content")
     @Mapping(target = "assignee", ignore = true)
@@ -37,7 +37,7 @@ public abstract class TaskMapper {
     @Mapping(target = "createdAt", ignore = true)
     public abstract Task map(TaskCreateDTO dto);
 
-    @Mapping(target = "labelIds", expression = "java(model.getLabels().stream().map(l -> l.getId()).toList())")
+    @Mapping(target = "taskLabelIds", expression = "java(model.getLabels().stream().map(l -> l.getId()).toList())")
     @Mapping(target = "title", source = "name")
     @Mapping(target = "content", source = "description")
     @Mapping(target = "createdAt",
@@ -48,6 +48,7 @@ public abstract class TaskMapper {
             expression = "java(model.getTaskStatus() != null ? model.getTaskStatus().getSlug() : null)")
     public abstract TaskDTO map(Task model);
 
+    @Mapping(target = "labels", source = "taskLabelIds")
     @Mapping(target = "name", source = "title")
     @Mapping(target = "description", source = "content")
     @Mapping(target = "assignee", ignore = true)
