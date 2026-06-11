@@ -22,3 +22,4 @@ rsa:
 sentry:
   dsn: ${SENTRY_DSN}
   traces-sample-rate: 1.0
+  auth-token: ${SENTRY_AUTH_TOKEN}
