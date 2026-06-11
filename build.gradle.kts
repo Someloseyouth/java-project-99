@@ -96,3 +96,9 @@ tasks.jacocoTestReport {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+configurations.all {
+    if (name != "checkstyle" && name != "checkstyleMain" && name != "checkstyleTest") {
+        resolutionStrategy.activateDependencyLocking()
+    }
+}
