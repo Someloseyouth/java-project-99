@@ -56,6 +56,25 @@ checkstyle {
     configDirectory.set(layout.projectDirectory.dir("config/checkstyle"))
 }
 
+val coverageExclusions = listOf(
+    "**/AppApplication*",
+    "**/DataInitializer*",
+    "**/config/**",
+    "**/component/**",
+    "**/mapper/ReferenceMapper*",
+    "**/dto/**",
+    "**/model/**",
+    "**/exception/**"
+)
+
+sonar {
+    properties {
+        property("sonar.projectKey", "Someloseyouth_java-project-99")
+        property("sonar.organization", "someloseyouth")
+        property("sonar.coverage.exclusions", coverageExclusions.joinToString(","))
+    }
+}
+
 tasks.test {
     finalizedBy(tasks.jacocoTestReport)
 }
@@ -68,12 +87,7 @@ tasks.jacocoTestReport {
     classDirectories.setFrom(
         files(classDirectories.files.map {
             fileTree(it) {
-                exclude(
-                    "**/AppApplication*",
-                    "**/DataInitializer*",
-                    "**/config/**",
-                    "**/component/**"
-                )
+                exclude(coverageExclusions)
             }
         })
     )
