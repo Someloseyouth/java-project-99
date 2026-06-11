@@ -5,7 +5,7 @@ plugins {
     id("org.springframework.boot") version "4.0.6"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.sonarqube") version "7.3.1.8318"
-    id("io.sentry.jvm.gradle") version "5.3.0"
+    id("io.sentry.jvm.gradle") version "6.9.0"
 }
 
 group = "hexlet.code"
@@ -33,7 +33,7 @@ dependencies {
     implementation("org.openapitools:jackson-databind-nullable:0.2.10")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.mapstruct:mapstruct:1.6.3")
-    implementation("io.sentry:sentry-spring-boot-4:8.33.0")
+    implementation("io.sentry:sentry-spring-boot-4-starter:8.27.0")
 
 
     compileOnly("org.projectlombok:lombok:1.18.42")
@@ -73,6 +73,10 @@ sentry {
     org.set("someloseyouth")
     projectName.set("java-project-99")
     authToken.set(System.getenv("SENTRY_AUTH_TOKEN"))
+
+    autoInstallation {
+        enabled.set(false)
+    }
 }
 
 sonar {
