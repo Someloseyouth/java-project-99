@@ -164,4 +164,10 @@ public class UsersControllerTest {
         // Проверяем, что второй пользователь не удалился
         assertThat(userRepository.findById(anotherUser.getId())).isPresent();
     }
+
+    @Test
+    public void testUserNotFound() throws Exception {
+        var request = get("/api/users/999999").with(jwt());
+        mockMvc.perform(request).andExpect(status().isNotFound());
+    }
 }
