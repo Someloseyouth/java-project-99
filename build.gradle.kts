@@ -96,7 +96,3 @@ tasks.jacocoTestReport {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
-
-dependencyLocking {
-    lockAllConfigurations()
-}
