@@ -69,7 +69,7 @@ val coverageExclusions = listOf(
 )
 
 sentry {
-    includeSourceContext.set(true)
+    includeSourceContext.set(false)
     org.set("someloseyouth")
     projectName.set("java-project-99")
     authToken.set(System.getenv("SENTRY_AUTH_TOKEN"))

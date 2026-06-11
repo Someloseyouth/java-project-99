@@ -11,10 +11,6 @@ COPY . .
 RUN npm i @hexlet/java-task-manager-frontend
 RUN npx build-frontend
 
-# Добовляем Sentry token
-ARG SENTRY_AUTH_TOKEN
-ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
-
 # Собираем Java приложение
 RUN gradle build -x test
 
