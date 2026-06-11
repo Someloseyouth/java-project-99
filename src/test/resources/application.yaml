@@ -1,10 +1,12 @@
-rsa:
-  private-key: classpath:certs/private.pem
-  public-key: classpath:certs/public.pem
-
 spring:
   profiles:
     active: test
+  autoconfigure:
+    exclude: io.sentry.spring.boot4.SentryAutoConfiguration
+
+rsa:
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem
 
 sentry:
   dsn: ""
