@@ -5,3 +5,7 @@ rsa:
 spring:
   profiles:
     active: test
+
+sentry:
+  dsn: ""
+  enabled: false
