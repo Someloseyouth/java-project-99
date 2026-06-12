@@ -10,7 +10,7 @@ import java.util.Set;
 @Setter
 @Getter
 public class TaskUpdateDTO {
-    private Set<Long> taskLabelIds = new HashSet<>();
+    private JsonNullable<Set<Long>> taskLabelIds;
 
     private JsonNullable<Integer> index;
 
