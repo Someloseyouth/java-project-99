@@ -1,6 +1,9 @@
 package hexlet.code.controller.api;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.UserDTO;
+import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
@@ -20,7 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -44,6 +47,9 @@ public class UsersControllerTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Autowired
     private TaskRepository taskRepository;
@@ -76,15 +82,31 @@ public class UsersControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         var body = result.getResponse().getContentAsString();
-        assertThat(body).contains(testUser.getEmail());
+
+        List<UserDTO> userDTOs = om.readValue(body, new TypeReference<List<UserDTO>>() {
+        });
+        var expectedDTOs = userRepository.findAll().stream()
+                .map(userMapper::map)
+                .toList();
+
+        assertThat(userDTOs)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrderElementsOf(expectedDTOs);
     }
 
     @Test
     public void testShow() throws Exception {
-        var request = get("/api/users/" + testUser.getId()).with(jwt());
-        var result = mockMvc.perform(request).andExpect(status().isOk()).andReturn();
+        var result = mockMvc.perform(get("/api/users/" + testUser.getId()).with(jwt()))
+                .andExpect(status().isOk())
+                .andReturn();
         var body = result.getResponse().getContentAsString();
-        assertThat(body).contains(testUser.getEmail());
+
+        UserDTO userDTO = om.readValue(body, UserDTO.class);
+        var expectedDTO = userMapper.map(testUser);
+
+        assertThat(userDTO)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedDTO);
     }
 
     @Test

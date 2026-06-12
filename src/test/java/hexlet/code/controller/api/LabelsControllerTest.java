@@ -1,6 +1,9 @@
 package hexlet.code.controller.api;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.LabelDTO;
+import hexlet.code.mapper.LabelMapper;
 import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.util.ModelGenerator;
@@ -16,7 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -28,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 
 
 @SpringBootTest
@@ -51,6 +55,9 @@ public class LabelsControllerTest {
 
     private Label testLabel;
 
+    @Autowired
+    private LabelMapper labelMapper;
+
     @BeforeEach
     public void setUp() {
         labelRepository.deleteAll();
@@ -69,17 +76,32 @@ public class LabelsControllerTest {
         var result = mockMvc.perform(get("/api/labels").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn();
-
         var body = result.getResponse().getContentAsString();
-        assertThat(body).contains(testLabel.getName());
+
+        List<LabelDTO> labelDTOs = om.readValue(body, new TypeReference<>() {
+        });
+        var expectedDTOs = labelRepository.findAll().stream()
+                .map(labelMapper::map)
+                .toList();
+
+        assertThat(labelDTOs)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrderElementsOf(expectedDTOs);
     }
 
     @Test
     public void testShow() throws Exception {
-        var request = get("/api/labels/" + testLabel.getId()).with(jwt());
-        var result = mockMvc.perform(request).andExpect(status().isOk()).andReturn();
+        var result = mockMvc.perform(get("/api/labels/" + testLabel.getId()).with(jwt()))
+                .andExpect(status().isOk())
+                .andReturn();
         var body = result.getResponse().getContentAsString();
-        assertThat(body).contains(testLabel.getName());
+
+        LabelDTO labelDTO = om.readValue(body, LabelDTO.class);
+        var expectedDTO = labelMapper.map(testLabel);
+
+        assertThat(labelDTO)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedDTO);
     }
 
     @Test

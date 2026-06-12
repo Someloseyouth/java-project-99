@@ -1,6 +1,8 @@
 package hexlet.code.controller.api;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import hexlet.code.dto.TaskDTO;
 import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.model.Task;
@@ -22,11 +24,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -79,36 +83,50 @@ public class TasksControllerTest {
                 .apply(springSecurity())
                 .build();
 
-        TaskStatus testStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
-        taskStatusRepository.save(testStatus);
+        this.testStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
+        taskStatusRepository.save(this.testStatus);
 
-        User testAssignee = Instancio.of(modelGenerator.getUserModel()).create();
-        userRepository.save(testAssignee);
+        this.testAssignee = Instancio.of(modelGenerator.getUserModel()).create();
+        userRepository.save(this.testAssignee);
 
         testTask = Instancio.of(modelGenerator.getTaskModel()).create();
-        testTask.setTaskStatus(testStatus);
-        testTask.setAssignee(testAssignee);
+        testTask.setTaskStatus(this.testStatus);
+        testTask.setAssignee(this.testAssignee);
         taskRepository.save(testTask);
-
-        this.testStatus = testStatus;
-        this.testAssignee = testAssignee;
     }
 
     @Test
+    @Transactional
     public void testIndex() throws Exception {
         var result = mockMvc.perform(get("/api/tasks").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn();
         var body = result.getResponse().getContentAsString();
-        assertThat(body).contains(testTask.getName());
+
+        List<TaskDTO> taskDTOs = om.readValue(body, new TypeReference<>() {
+        });
+        var expectedDTOs = taskRepository.findAll().stream()
+                .map(taskMapper::map)
+                .toList();
+
+        assertThat(taskDTOs)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrderElementsOf(expectedDTOs);
     }
 
     @Test
     public void testShow() throws Exception {
-        var request = get("/api/tasks/" + testTask.getId()).with(jwt());
-        var result = mockMvc.perform(request).andExpect(status().isOk()).andReturn();
+        var result = mockMvc.perform(get("/api/tasks/" + testTask.getId()).with(jwt()))
+                .andExpect(status().isOk())
+                .andReturn();
         var body = result.getResponse().getContentAsString();
-        assertThat(body).contains(testTask.getName());
+
+        TaskDTO taskDTO = om.readValue(body, TaskDTO.class);
+        var expectedDTO = taskMapper.map(testTask);
+
+        assertThat(taskDTO)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedDTO);
     }
 
     @Test
@@ -172,7 +190,7 @@ public class TasksControllerTest {
     @Test
     public void testFilterByStatus() throws Exception {
         var result = mockMvc.perform(get("/api/tasks").with(jwt())
-                .param("status", testStatus.getSlug()))
+                        .param("status", testStatus.getSlug()))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -180,9 +198,10 @@ public class TasksControllerTest {
         assertThat(body).contains(testTask.getName());
     }
 
-    @Test void testFilterByAssigneeId() throws Exception {
+    @Test
+    void testFilterByAssigneeId() throws Exception {
         var result = mockMvc.perform(get("/api/tasks").with(jwt())
-                .param("assigneeId", String.valueOf(testAssignee.getId())))
+                        .param("assigneeId", String.valueOf(testAssignee.getId())))
                 .andExpect(status().isOk())
                 .andReturn();
 

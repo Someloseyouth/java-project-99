@@ -19,7 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class TaskServiceTest {
 
     @Autowired
-    private TaskService taskService;
+    private TaskServiceImpl taskService;
 
     @Autowired
     private TaskRepository taskRepository;
@@ -77,7 +77,7 @@ public class TaskServiceTest {
         dto.setContent("Some description");
         dto.setStatus(testStatus.getSlug());
         dto.setAssigneeId(testAssignee.getId());
-        dto.setTaskLabelIds(List.of());
+        dto.setTaskLabelIds(new HashSet<>());
 
         var createdDto = taskService.create(dto);
 
@@ -95,7 +95,7 @@ public class TaskServiceTest {
         dto.setContent("Broken");
         dto.setStatus("unknown_status");
         dto.setAssigneeId(testAssignee.getId());
-        dto.setTaskLabelIds(List.of());
+        dto.setTaskLabelIds(new HashSet<>());
 
         assertThrows(RuntimeException.class, () -> taskService.create(dto));
         assertThat(taskRepository.findByName("Broken")).isEmpty();

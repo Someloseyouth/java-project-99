@@ -3,60 +3,17 @@ package hexlet.code.service;
 import hexlet.code.dto.TaskStatusCreateDTO;
 import hexlet.code.dto.TaskStatusDTO;
 import hexlet.code.dto.TaskStatusUpdateDTO;
-import hexlet.code.exception.ResourceNotFoundException;
-import hexlet.code.mapper.TaskStatusMapper;
-import hexlet.code.repository.TaskRepository;
-import hexlet.code.repository.TaskStatusRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-@Service
-public class TaskStatusService {
-    @Autowired
-    private TaskStatusRepository taskStatusRepository;
+public interface TaskStatusService {
+    List<TaskStatusDTO> getAll();
 
-    @Autowired
-    private TaskRepository taskRepository;
+    TaskStatusDTO create(TaskStatusCreateDTO taskStatusData);
 
-    @Autowired
-    private TaskStatusMapper taskStatusMapper;
+    TaskStatusDTO findById(Long id);
 
-    public List<TaskStatusDTO> getAll() {
-        var taskStatuses = taskStatusRepository.findAll();
-        return taskStatuses.stream()
-                .map(taskStatusMapper::map)
-                .toList();
-    }
+    TaskStatusDTO update(TaskStatusUpdateDTO taskStatusData, Long id);
 
-    public TaskStatusDTO create(TaskStatusCreateDTO taskStatusData) {
-        var taskStatus = taskStatusMapper.map(taskStatusData);
-        taskStatusRepository.save(taskStatus);
-        return taskStatusMapper.map(taskStatus);
-    }
-
-    public TaskStatusDTO findById(Long id) {
-        var taskStatus = taskStatusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("TaskStatus with id " + id + " not found"));
-        return taskStatusMapper.map(taskStatus);
-    }
-
-    public TaskStatusDTO update(TaskStatusUpdateDTO taskStatusData, Long id) {
-        var taskStatus = taskStatusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("TaskStatus with id " + id + " not found"));
-        taskStatusMapper.update(taskStatusData, taskStatus);
-        taskStatusRepository.save(taskStatus);
-        return taskStatusMapper.map(taskStatus);
-    }
-
-    public void delete(Long id) {
-        if (taskRepository.existsByTaskStatusId(id)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Status is used by a task");
-        }
-        taskStatusRepository.deleteById(id);
-    }
+    void delete(Long id);
 }

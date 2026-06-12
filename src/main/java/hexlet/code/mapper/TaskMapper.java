@@ -11,12 +11,14 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Mapper(
         uses = {JsonNullableMapper.class, ReferenceMapper.class},
@@ -29,7 +31,7 @@ public abstract class TaskMapper {
     @Autowired
     private LabelRepository labelRepository;
 
-    @Mapping(target = "labels", source = "taskLabelIds")
+    @Mapping(target = "labels", source = "taskLabelIds", qualifiedByName = "toLabels")
     @Mapping(target = "name", source = "title")
     @Mapping(target = "description", source = "content")
     @Mapping(target = "assignee", ignore = true)
@@ -37,7 +39,7 @@ public abstract class TaskMapper {
     @Mapping(target = "createdAt", ignore = true)
     public abstract Task map(TaskCreateDTO dto);
 
-    @Mapping(target = "taskLabelIds", expression = "java(model.getLabels().stream().map(l -> l.getId()).toList())")
+    @Mapping(target = "taskLabelIds", expression = "java(toLabelIds(model.getLabels()))")
     @Mapping(target = "title", source = "name")
     @Mapping(target = "content", source = "description")
     @Mapping(target = "createdAt",
@@ -48,7 +50,7 @@ public abstract class TaskMapper {
             expression = "java(model.getTaskStatus() != null ? model.getTaskStatus().getSlug() : null)")
     public abstract TaskDTO map(Task model);
 
-    @Mapping(target = "labels", source = "taskLabelIds")
+    @Mapping(target = "labels", source = "taskLabelIds", qualifiedByName = "toLabels")
     @Mapping(target = "name", source = "title")
     @Mapping(target = "description", source = "content")
     @Mapping(target = "assignee", ignore = true)
@@ -56,13 +58,36 @@ public abstract class TaskMapper {
     @Mapping(target = "createdAt", ignore = true)
     public abstract void update(TaskUpdateDTO dto, @MappingTarget Task model);
 
-    public List<Label> toLabels(List<Long> ids) {
-        if (ids == null) {
-            return new ArrayList<>();
+    public Set<Long> toLabelIds(Set<Label> labels) {
+        if (labels == null) {
+            return new HashSet<>();
         }
-        return ids.stream()
-                .map(id -> labelRepository.findById(id)
-                        .orElseThrow(() -> new ResourceNotFoundException("Label " + id + " not found")))
-                .toList();
+        HashSet<Long> result = new HashSet<>();
+        for (Label l : labels) {
+            result.add(l.getId());
+        }
+        return result;
+    }
+
+    @Named("toLabels")
+    public Set<Label> toLabels(Set<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new HashSet<>();
+        }
+
+        List<Label> result = labelRepository.findAllById(ids);
+
+        Set<Long> foundIds = new HashSet<>();
+        for (Label l : result) {
+            foundIds.add(l.getId());
+        }
+
+        for (Long id : ids) {
+            if (!foundIds.contains(id)) {
+                throw new ResourceNotFoundException("Label " + id + " not found");
+            }
+        }
+
+        return new HashSet<>(result);
     }
 }

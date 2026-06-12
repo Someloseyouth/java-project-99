@@ -8,8 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
-    boolean existsByAssigneeId(Long assigneeId);
-    boolean existsByTaskStatusId(Long taskStatusId);
-    boolean existsByLabelsId(Long labelsId);
     Optional<Task> findByName(String name);
 }

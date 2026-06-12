@@ -1,6 +1,9 @@
 package hexlet.code.controller.api;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.TaskStatusDTO;
+import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.util.ModelGenerator;
@@ -18,6 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -49,6 +53,8 @@ public class TaskStatusesControllerTest {
     private ObjectMapper om;
 
     private TaskStatus testTaskStatus;
+    @Autowired
+    private TaskStatusMapper taskStatusMapper;
 
     @BeforeEach
     public void setUp() {
@@ -69,17 +75,31 @@ public class TaskStatusesControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         var body = result.getResponse().getContentAsString();
-        assertThat(body).contains(testTaskStatus.getSlug());
-        assertThat(body).contains(testTaskStatus.getName());
+
+        List<TaskStatusDTO> taskStatusDTOs = om.readValue(body, new TypeReference<List<TaskStatusDTO>>() {
+        });
+        var expectedDTOs = taskStatusRepository.findAll().stream()
+                .map(taskStatusMapper::map)
+                .toList();
+
+        assertThat(taskStatusDTOs)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrderElementsOf(expectedDTOs);
     }
 
     @Test
     public void testShow() throws Exception {
-        var request = get("/api/task_statuses/" + testTaskStatus.getId()).with(jwt());
-        var result = mockMvc.perform(request).andExpect(status().isOk()).andReturn();
+        var result = mockMvc.perform(get("/api/task_statuses/" + testTaskStatus.getId()).with(jwt()))
+                .andExpect(status().isOk())
+                .andReturn();
         var body = result.getResponse().getContentAsString();
-        assertThat(body).contains(testTaskStatus.getSlug());
-        assertThat(body).contains(testTaskStatus.getName());
+
+        TaskStatusDTO taskStatusDTO = om.readValue(body, TaskStatusDTO.class);
+        var expectedDTO = taskStatusMapper.map(testTaskStatus);
+
+        assertThat(taskStatusDTO)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedDTO);
     }
 
     @Test

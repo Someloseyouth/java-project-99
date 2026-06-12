@@ -5,13 +5,13 @@ import jakarta.validation.constraints.Size;
 import lombok.Setter;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Setter
 @Getter
 public class TaskCreateDTO {
-    private List<Long> taskLabelIds = new ArrayList<>();
+    private Set<Long> taskLabelIds = new HashSet<>();
 
     private Integer index;
 

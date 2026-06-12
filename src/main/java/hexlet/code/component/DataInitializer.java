@@ -4,9 +4,9 @@ import hexlet.code.dto.LabelCreateDTO;
 import hexlet.code.dto.TaskStatusCreateDTO;
 import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.repository.UserRepository;
-import hexlet.code.service.LabelService;
-import hexlet.code.service.TaskStatusService;
-import hexlet.code.service.UserService;
+import hexlet.code.service.LabelServiceImpl;
+import hexlet.code.service.TaskStatusServiceImpl;
+import hexlet.code.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -18,15 +18,15 @@ import org.springframework.stereotype.Component;
 public class DataInitializer implements ApplicationRunner {
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private TaskStatusService taskStatusService;
+    private TaskStatusServiceImpl taskStatusService;
     @Autowired
-    private LabelService labelService;
+    private LabelServiceImpl labelService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

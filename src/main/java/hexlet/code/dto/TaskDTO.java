@@ -4,15 +4,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Setter
 @Getter
 public class TaskDTO {
     private Long id;
 
-    private List<Long> taskLabelIds = new ArrayList<>();
+    private Set<Long> taskLabelIds = new HashSet<>();
 
     private Integer index;
 

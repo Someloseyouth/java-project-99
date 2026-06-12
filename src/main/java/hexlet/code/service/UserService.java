@@ -3,71 +3,17 @@ package hexlet.code.service;
 import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.dto.UserUpdateDTO;
-import hexlet.code.exception.ResourceNotFoundException;
-import hexlet.code.mapper.UserMapper;
-import hexlet.code.repository.TaskRepository;
-import hexlet.code.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-@Service
-public class UserService {
-    @Autowired
-    private UserRepository userRepository;
+public interface UserService {
+    List<UserDTO> getAll();
 
-    @Autowired
-    private TaskRepository taskRepository;
+    UserDTO create(UserCreateDTO userData);
 
-    @Autowired
-    private UserMapper userMapper;
+    UserDTO findById(Long id);
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    UserDTO update(UserUpdateDTO userData, Long id);
 
-    public List<UserDTO> getAll() {
-        var users = userRepository.findAll();
-        return users.stream()
-                .map(userMapper::map)
-                .toList();
-    }
-
-    public UserDTO create(UserCreateDTO userData) {
-        var user = userMapper.map(userData);
-        var hashedPassword = passwordEncoder.encode(userData.getPassword());
-        user.setPasswordDigest(hashedPassword);
-        userRepository.save(user);
-        return userMapper.map(user);
-    }
-
-    public UserDTO findById(Long id) {
-        var user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
-        return userMapper.map(user);
-    }
-
-    public UserDTO update(UserUpdateDTO userData, Long id) {
-        var user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
-        userMapper.update(userData, user);
-        if (userData.getPassword() != null && userData.getPassword().isPresent()) {
-            var hashedPassword = passwordEncoder.encode(userData.getPassword().get());
-            user.setPasswordDigest(hashedPassword);
-        }
-        userRepository.save(user);
-        return userMapper.map(user);
-    }
-
-    public void delete(Long id) {
-        if (taskRepository.existsByAssigneeId(id)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "User is assigned to a task");
-        }
-        userRepository.deleteById(id);
-    }
-
+    void delete(Long id);
 }

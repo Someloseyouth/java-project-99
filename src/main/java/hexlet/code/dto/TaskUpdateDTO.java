@@ -4,12 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.jackson.nullable.JsonNullable;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Setter
 @Getter
 public class TaskUpdateDTO {
-    private JsonNullable<List<Long>> taskLabelIds;
+    private Set<Long> taskLabelIds = new HashSet<>();
 
     private JsonNullable<Integer> index;
 
