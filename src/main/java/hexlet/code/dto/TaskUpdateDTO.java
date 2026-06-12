@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.openapitools.jackson.nullable.JsonNullable;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Setter
