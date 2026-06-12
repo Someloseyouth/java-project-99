@@ -5,9 +5,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import hexlet.code.dto.TaskDTO;
 import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.mapper.TaskMapper;
+import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
@@ -29,6 +31,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -63,6 +66,9 @@ public class TasksControllerTest {
     private UserRepository userRepository;
 
     @Autowired
+    private LabelRepository labelRepository;
+
+    @Autowired
     private ObjectMapper om;
 
     @Autowired
@@ -71,6 +77,8 @@ public class TasksControllerTest {
     private Task testTask;
     private TaskStatus testStatus;
     private User testAssignee;
+    private Label testLabel;
+
 
     @BeforeEach
     public void setUp() {
@@ -93,6 +101,8 @@ public class TasksControllerTest {
         testTask.setTaskStatus(this.testStatus);
         testTask.setAssignee(this.testAssignee);
         taskRepository.save(testTask);
+        testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        labelRepository.save(testLabel);
     }
 
     @Test
@@ -207,5 +217,41 @@ public class TasksControllerTest {
 
         var body = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         assertThat(body).contains(testTask.getName());
+    }
+
+    @Test
+    public void testCreateWithLabels() throws Exception {
+        var data = Instancio.of(modelGenerator.getTaskModel()).create();
+        data.setTaskStatus(testStatus);
+        data.setAssignee(testAssignee);
+
+        var dto = taskMapper.map(data);
+        dto.setTaskLabelIds(Set.of(testLabel.getId()));
+
+        var request = post("/api/tasks").with(jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(dto));
+
+        var result = mockMvc.perform(request)
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString();
+        var taskDTO = om.readValue(body, TaskDTO.class);
+        assertThat(taskDTO.getTaskLabelIds()).contains(testLabel.getId());
+    }
+
+    @Test
+    public void testCreateWithNonExistentLabel() throws Exception {
+        var data = Instancio.of(modelGenerator.getTaskModel()).create();
+        data.setTaskStatus(testStatus);
+
+        var dto = taskMapper.map(data);
+        dto.setTaskLabelIds(Set.of(999999L)); // несуществующий label
+
+        var request = post("/api/tasks").with(jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(dto));
+        mockMvc.perform(request).andExpect(status().isNotFound());
     }
 }
