@@ -9,7 +9,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -29,7 +28,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 public class TaskStatus {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @EqualsAndHashCode.Include
     private Long id;
 
     @NotNull
@@ -46,4 +44,21 @@ public class TaskStatus {
 
     @OneToMany(mappedBy = "taskStatus")
     private List<Task> tasks = new ArrayList<>();
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TaskStatus taskStatus = (TaskStatus) o;
+        return id != null && id.equals(taskStatus.id);
+    }
+
+    @Override
+    public final int hashCode() {
+        return getClass().hashCode();
+    }
 }

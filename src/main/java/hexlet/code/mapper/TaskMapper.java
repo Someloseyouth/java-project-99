@@ -39,7 +39,7 @@ public abstract class TaskMapper {
     @Mapping(target = "createdAt", ignore = true)
     public abstract Task map(TaskCreateDTO dto);
 
-    @Mapping(target = "taskLabelIds", expression = "java(toLabelIds(model.getLabels()))")
+    @Mapping(target = "taskLabelIds", source = "labels", qualifiedByName = "toLabelIds")
     @Mapping(target = "title", source = "name")
     @Mapping(target = "content", source = "description")
     @Mapping(target = "createdAt",
@@ -58,6 +58,7 @@ public abstract class TaskMapper {
     @Mapping(target = "createdAt", ignore = true)
     public abstract void update(TaskUpdateDTO dto, @MappingTarget Task model);
 
+    @Named("toLabelIds")
     public Set<Long> toLabelIds(Set<Label> labels) {
         if (labels == null) {
             return new HashSet<>();

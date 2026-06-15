@@ -7,7 +7,7 @@ import hexlet.code.repository.UserRepository;
 import hexlet.code.service.LabelServiceImpl;
 import hexlet.code.service.TaskStatusServiceImpl;
 import hexlet.code.service.UserServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
@@ -15,18 +15,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile("!test")
+@AllArgsConstructor
 public class DataInitializer implements ApplicationRunner {
+    private final UserServiceImpl userService;
 
-    @Autowired
-    private UserServiceImpl userService;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final TaskStatusServiceImpl taskStatusService;
 
-    @Autowired
-    private TaskStatusServiceImpl taskStatusService;
-    @Autowired
-    private LabelServiceImpl labelService;
+    private final LabelServiceImpl labelService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

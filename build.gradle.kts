@@ -74,10 +74,6 @@ sonar {
     }
 }
 
-tasks.test {
-    finalizedBy(tasks.jacocoTestReport)
-}
-
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
     reports {
@@ -93,6 +89,7 @@ tasks.jacocoTestReport {
 }
 
 tasks.withType<Test> {
+    finalizedBy(tasks.jacocoTestReport)
     useJUnitPlatform()
 }
 

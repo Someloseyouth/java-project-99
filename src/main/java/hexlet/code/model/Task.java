@@ -11,7 +11,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -31,7 +30,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 public class Task {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @EqualsAndHashCode.Include
     private Long id;
 
     private Integer index;
@@ -59,4 +57,21 @@ public class Task {
             inverseJoinColumns = @JoinColumn(name = "label_id")
     )
     private Set<Label> labels = new HashSet<>();
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Task task = (Task) o;
+        return id != null && id.equals(task.id);
+    }
+
+    @Override
+    public final int hashCode() {
+        return getClass().hashCode();
+    }
 }
