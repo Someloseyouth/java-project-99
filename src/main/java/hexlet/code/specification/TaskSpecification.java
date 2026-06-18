@@ -34,6 +34,7 @@ public class TaskSpecification {
             if (labelId == null) {
                 return cb.conjunction();
             }
+            query.distinct(true);
             var labels = root.join("labels");
             return cb.equal(labels.get("id"), labelId);
         };
