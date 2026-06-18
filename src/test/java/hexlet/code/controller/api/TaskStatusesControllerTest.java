@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -83,6 +82,7 @@ public class TaskStatusesControllerTest {
                 .map(taskStatusMapper::map)
                 .toList();
 
+        assertThat(taskStatusDTOs).isNotEmpty();
         assertThat(taskStatusDTOs)
                 .usingRecursiveFieldByFieldElementComparator()
                 .containsExactlyInAnyOrderElementsOf(expectedDTOs);
@@ -110,14 +110,18 @@ public class TaskStatusesControllerTest {
         var request = post("/api/task_statuses").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
-        mockMvc.perform(request).andExpect(status().isCreated());
 
-        var taskStatus = taskStatusRepository.findBySlug(data.getSlug()).orElse(null);
+        var result = mockMvc.perform(request)
+                .andExpect(status().isCreated())
+                .andReturn();
 
-        assertNotNull(taskStatus);
-        assertThat(taskStatus.getSlug()).isEqualTo(data.getSlug());
-        assertThat(taskStatus.getName()).isEqualTo(data.getName());
+        var response = om.readValue(
+                result.getResponse().getContentAsString(), TaskStatusDTO.class);
 
+        assertThat(response.getId()).isNotNull();
+        assertThat(response.getName()).isEqualTo(data.getName());
+        assertThat(response.getSlug()).isEqualTo(data.getSlug());
+        assertThat(response.getCreatedAt()).isNotNull();
     }
 
     @Test
@@ -131,11 +135,16 @@ public class TaskStatusesControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
 
-        mockMvc.perform(request).andExpect(status().isOk());
+        var result = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn();
 
-        var taskStatus = taskStatusRepository.findById(testTaskStatus.getId()).orElseThrow();
-        assertThat(taskStatus.getSlug()).isEqualTo("to_review");
-        assertThat(taskStatus.getName()).isEqualTo("To review");
+        var response = om.readValue(
+                result.getResponse().getContentAsString(), TaskStatusDTO.class);
+
+        assertThat(response.getName()).isEqualTo("To review");
+        assertThat(response.getSlug()).isEqualTo("to_review");
+        assertThat(response.getId()).isEqualTo(testTaskStatus.getId());
     }
 
     @Test

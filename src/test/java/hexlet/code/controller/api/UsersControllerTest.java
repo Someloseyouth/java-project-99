@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -89,6 +88,7 @@ public class UsersControllerTest {
                 .map(userMapper::map)
                 .toList();
 
+        assertThat(userDTOs).isNotEmpty();
         assertThat(userDTOs)
                 .usingRecursiveFieldByFieldElementComparator()
                 .containsExactlyInAnyOrderElementsOf(expectedDTOs);
@@ -116,13 +116,22 @@ public class UsersControllerTest {
         var request = post("/api/users").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
-        mockMvc.perform(request).andExpect(status().isCreated());
 
-        var user = userRepository.findByEmail(data.getEmail()).orElse(null);
+        var result = mockMvc.perform(request)
+                .andExpect(status().isCreated())
+                .andReturn();
 
-        assertNotNull(user);
-        assertThat(user.getFirstName()).isEqualTo(data.getFirstName());
-        assertThat(user.getLastName()).isEqualTo(data.getLastName());
+        var response = om.readValue(
+                result.getResponse().getContentAsString(), UserDTO.class);
+
+        assertThat(response.getId()).isNotNull();
+        assertThat(response.getEmail()).isEqualTo(data.getEmail());
+        assertThat(response.getFirstName()).isEqualTo(data.getFirstName());
+        assertThat(response.getLastName()).isEqualTo(data.getLastName());
+
+        assertThat(result.getResponse().getContentAsString())
+                .doesNotContain("password")
+                .doesNotContain("passwordDigest");
     }
 
     @Test
@@ -136,10 +145,16 @@ public class UsersControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
 
-        mockMvc.perform(request).andExpect(status().isOk());
+        var result = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn();
 
-        var user = userRepository.findById(testUser.getId()).orElseThrow();
-        assertThat(user.getFirstName()).isEqualTo("Tony");
+        var response = om.readValue(
+                result.getResponse().getContentAsString(), UserDTO.class);
+
+        assertThat(response.getFirstName()).isEqualTo("Tony");
+        assertThat(response.getId()).isEqualTo(testUser.getId());
+        assertThat(response.getEmail()).isEqualTo(testUser.getEmail());
     }
 
 

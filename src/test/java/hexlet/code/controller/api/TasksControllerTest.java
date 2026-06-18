@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -119,6 +118,7 @@ public class TasksControllerTest {
                 .map(taskMapper::map)
                 .toList();
 
+        assertThat(taskDTOs).isNotEmpty();
         assertThat(taskDTOs)
                 .usingRecursiveFieldByFieldElementComparator()
                 .containsExactlyInAnyOrderElementsOf(expectedDTOs);
@@ -150,12 +150,18 @@ public class TasksControllerTest {
         var request = post("/api/tasks").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
-        mockMvc.perform(request).andExpect(status().isCreated());
 
-        var task = taskRepository.findByName(data.getName()).orElse(null);
+        var result = mockMvc.perform(request)
+                .andExpect(status().isCreated())
+                .andReturn();
 
-        assertNotNull(task);
-        assertThat(task.getName()).isEqualTo(data.getName());
+        var response = om.readValue(
+                result.getResponse().getContentAsString(), TaskDTO.class);
+
+        assertThat(response.getId()).isNotNull();
+        assertThat(response.getTitle()).isEqualTo(data.getName());
+        assertThat(response.getStatus()).isEqualTo(testStatus.getSlug());
+        assertThat(response.getAssigneeId()).isEqualTo(testAssignee.getId());
     }
 
     @Test
@@ -168,10 +174,16 @@ public class TasksControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
 
-        mockMvc.perform(request).andExpect(status().isOk());
+        var result = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn();
 
-        var task = taskRepository.findById(testTask.getId()).orElseThrow();
-        assertThat(task.getName()).isEqualTo("Task");
+        var response = om.readValue(
+                result.getResponse().getContentAsString(), TaskDTO.class);
+
+        assertThat(response.getTitle()).isEqualTo("Task");
+        assertThat(response.getId()).isEqualTo(testTask.getId());
+        assertThat(response.getStatus()).isEqualTo(testStatus.getSlug());
     }
 
     @Test
@@ -205,18 +217,26 @@ public class TasksControllerTest {
                 .andReturn();
 
         var body = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
-        assertThat(body).contains(testTask.getName());
+
+        List<TaskDTO> tasks = om.readValue(body, new TypeReference<>() {
+        });
+        assertThat(tasks).isNotEmpty();
+        assertThat(tasks).allMatch(t -> t.getStatus().equals(testStatus.getSlug()));
     }
 
     @Test
-    void testFilterByAssigneeId() throws Exception {
+    public void testFilterByAssigneeId() throws Exception {
         var result = mockMvc.perform(get("/api/tasks").with(jwt())
                         .param("assigneeId", String.valueOf(testAssignee.getId())))
                 .andExpect(status().isOk())
                 .andReturn();
 
         var body = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
-        assertThat(body).contains(testTask.getName());
+
+        List<TaskDTO> tasks = om.readValue(body, new TypeReference<>() {
+        });
+        assertThat(tasks).isNotEmpty();
+        assertThat(tasks).allMatch(t -> t.getAssigneeId().equals(testAssignee.getId()));
     }
 
     @Test
@@ -247,7 +267,7 @@ public class TasksControllerTest {
         data.setTaskStatus(testStatus);
 
         var dto = taskMapper.map(data);
-        dto.setTaskLabelIds(Set.of(999999L)); // несуществующий label
+        dto.setTaskLabelIds(Set.of(999999L));
 
         var request = post("/api/tasks").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)

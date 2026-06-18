@@ -1,6 +1,6 @@
 package hexlet.code.dto;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Setter;
 import lombok.Getter;
@@ -17,13 +17,13 @@ public class TaskCreateDTO {
 
     private Long assigneeId;
 
-    @NotNull
+    @NotBlank
     @Size(min = 1)
     private String title;
 
     private String content;
 
-    @NotNull
+    @NotBlank
     @Size(min = 1)
     private String status;
 }

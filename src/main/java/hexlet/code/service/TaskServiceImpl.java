@@ -83,30 +83,31 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found"));
         taskMapper.update(taskData, task);
 
-        if (taskData.getAssigneeId() != null && taskData.getAssigneeId().isPresent()) {
-            var assigneeId = taskData.getAssigneeId().get();
-            if (assigneeId == null) {
-                // явно удалили исполнителя
-                task.setAssignee(null);
-            } else {
-                User assignee = userRepository.findById(assigneeId)
-                        .orElseThrow(() -> new ResourceNotFoundException("User " + assigneeId + " not found"));
-                task.setAssignee(assignee);
-            }
+        if (taskData.getAssigneeId() != null) {
+            taskData.getAssigneeId().ifPresent(assigneeId -> {
+                if (assigneeId == null) {
+                    task.setAssignee(null);
+                } else {
+                    User assignee = userRepository.findById(assigneeId)
+                            .orElseThrow(() -> new ResourceNotFoundException("User " + assigneeId + " not found"));
+                    task.setAssignee(assignee);
+                }
+            });
         }
 
-        if (taskData.getStatus() != null && taskData.getStatus().isPresent()) {
-            var statusSlug = taskData.getStatus().get();
-            if (statusSlug == null) {
-                throw new IllegalArgumentException("Task status cannot be null");
-            }
-            TaskStatus status = taskStatusRepository.findBySlug(statusSlug)
-                    .orElseThrow(() -> new ResourceNotFoundException("Status " + statusSlug + " not found"));
-            task.setTaskStatus(status);
+        if (taskData.getStatus() != null) {
+            taskData.getStatus().ifPresent(statusSlug -> {
+                if (statusSlug == null) {
+                    throw new IllegalArgumentException("Task status cannot be null");
+                }
+                TaskStatus status = taskStatusRepository.findBySlug(statusSlug)
+                        .orElseThrow(() -> new ResourceNotFoundException("Status " + statusSlug + " not found"));
+                task.setTaskStatus(status);
+            });
         }
 
-        if (taskData.getTaskLabelIds() != null && taskData.getTaskLabelIds().isPresent()) {
-            task.setLabels(resolveLabels(taskData.getTaskLabelIds().get()));
+        if (taskData.getTaskLabelIds() != null) {
+            taskData.getTaskLabelIds().ifPresent(ids -> task.setLabels(resolveLabels(ids)));
         }
 
         taskRepository.save(task);

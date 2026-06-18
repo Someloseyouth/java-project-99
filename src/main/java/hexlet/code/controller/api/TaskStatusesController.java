@@ -28,6 +28,7 @@ public class TaskStatusesController {
     private final TaskStatusService taskStatusService;
 
     @GetMapping("")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<TaskStatusDTO>> index() {
         List<TaskStatusDTO> taskStatuses = taskStatusService.getAll();
 

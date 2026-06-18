@@ -9,10 +9,12 @@ import hexlet.code.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
@@ -50,9 +52,9 @@ public class UserServiceImpl implements UserService {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
         userMapper.update(userData, user);
-        if (userData.getPassword() != null && userData.getPassword().isPresent()) {
-            var hashedPassword = passwordEncoder.encode(userData.getPassword().get());
-            user.setPasswordDigest(hashedPassword);
+        if (userData.getPassword() != null) {
+            userData.getPassword().ifPresent(password ->
+                    user.setPasswordDigest(passwordEncoder.encode(password)));
         }
         userRepository.save(user);
         return userMapper.map(user);

@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -84,6 +83,7 @@ public class LabelsControllerTest {
                 .map(labelMapper::map)
                 .toList();
 
+        assertThat(labelDTOs).isNotEmpty();
         assertThat(labelDTOs)
                 .usingRecursiveFieldByFieldElementComparator()
                 .containsExactlyInAnyOrderElementsOf(expectedDTOs);
@@ -111,12 +111,17 @@ public class LabelsControllerTest {
         var request = post("/api/labels").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
-        mockMvc.perform(request).andExpect(status().isCreated());
 
-        var label = labelRepository.findByName(data.getName()).orElse(null);
+        var result = mockMvc.perform(request)
+                .andExpect(status().isCreated())
+                .andReturn();
 
-        assertNotNull(label);
-        assertThat(label.getName()).isEqualTo(data.getName());
+        var response = om.readValue(
+                result.getResponse().getContentAsString(), LabelDTO.class);
+
+        assertThat(response.getId()).isNotNull();
+        assertThat(response.getName()).isEqualTo(data.getName());
+        assertThat(response.getCreatedAt()).isNotNull();
     }
 
     @Test
@@ -129,10 +134,15 @@ public class LabelsControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
 
-        mockMvc.perform(request).andExpect(status().isOk());
+        var result = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn();
 
-        var label = labelRepository.findById(testLabel.getId()).orElseThrow();
-        assertThat(label.getName()).isEqualTo("fix");
+        var response = om.readValue(
+                result.getResponse().getContentAsString(), LabelDTO.class);
+
+        assertThat(response.getName()).isEqualTo("fix");
+        assertThat(response.getId()).isEqualTo(testLabel.getId());
     }
 
     @Test
