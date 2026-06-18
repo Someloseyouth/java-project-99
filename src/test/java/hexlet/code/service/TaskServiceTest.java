@@ -1,6 +1,7 @@
 package hexlet.code.service;
 
 import hexlet.code.dto.TaskCreateDTO;
+import hexlet.code.dto.TaskFilter;
 import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.model.Task;
@@ -163,12 +164,10 @@ public class TaskServiceTest {
 
     @Test
     public void testGetAllByStatus() {
-        var result = taskService.getAll(
-                null,         // titleCont
-                null,                 // assigneeId
-                testStatus.getSlug(), // status
-                null                  // labelId
-        );
+        var filter = new TaskFilter();
+        filter.setStatus(testStatus.getSlug());
+
+        var result = taskService.getAll(filter);
 
         assertThat(result)
                 .extracting("id")

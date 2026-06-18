@@ -3,10 +3,8 @@ package hexlet.code.mapper;
 import hexlet.code.dto.TaskCreateDTO;
 import hexlet.code.dto.TaskDTO;
 import hexlet.code.dto.TaskUpdateDTO;
-import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
-import hexlet.code.repository.LabelRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -14,10 +12,8 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Mapper(
@@ -28,10 +24,7 @@ import java.util.Set;
 )
 
 public abstract class TaskMapper {
-    @Autowired
-    private LabelRepository labelRepository;
-
-    @Mapping(target = "labels", source = "taskLabelIds", qualifiedByName = "toLabels")
+    @Mapping(target = "labels", ignore = true)
     @Mapping(target = "name", source = "title")
     @Mapping(target = "description", source = "content")
     @Mapping(target = "assignee", ignore = true)
@@ -50,7 +43,7 @@ public abstract class TaskMapper {
             expression = "java(model.getTaskStatus() != null ? model.getTaskStatus().getSlug() : null)")
     public abstract TaskDTO map(Task model);
 
-    @Mapping(target = "labels", source = "taskLabelIds", qualifiedByName = "toLabels")
+    @Mapping(target = "labels", ignore = true)
     @Mapping(target = "name", source = "title")
     @Mapping(target = "description", source = "content")
     @Mapping(target = "assignee", ignore = true)
@@ -68,27 +61,5 @@ public abstract class TaskMapper {
             result.add(l.getId());
         }
         return result;
-    }
-
-    @Named("toLabels")
-    public Set<Label> toLabels(Set<Long> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return new HashSet<>();
-        }
-
-        List<Label> result = labelRepository.findAllById(ids);
-
-        Set<Long> foundIds = new HashSet<>();
-        for (Label l : result) {
-            foundIds.add(l.getId());
-        }
-
-        for (Long id : ids) {
-            if (!foundIds.contains(id)) {
-                throw new ResourceNotFoundException("Label " + id + " not found");
-            }
-        }
-
-        return new HashSet<>(result);
     }
 }
