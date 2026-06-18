@@ -45,13 +45,13 @@ public class LabelsControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    LabelRepository labelRepository;
+    private LabelRepository labelRepository;
 
     @Autowired
     private ModelGenerator modelGenerator;
 
     @Autowired
-    ObjectMapper om;
+    private ObjectMapper om;
 
     private Label testLabel;
 

@@ -52,9 +52,10 @@ public class TaskStatusesControllerTest {
     @Autowired
     private ObjectMapper om;
 
-    private TaskStatus testTaskStatus;
     @Autowired
     private TaskStatusMapper taskStatusMapper;
+
+    private TaskStatus testTaskStatus;
 
     @BeforeEach
     public void setUp() {
